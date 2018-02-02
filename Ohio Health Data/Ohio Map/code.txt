@@ -1,0 +1,85 @@
+geoproject 'd3.geoTransverseMercator().rotate([82.5, 0]).fitSize([960, 960], d)' < oh.json > oh-epsg32122.json
+
+ndjson-split 'd.features' < oh-epsg32122.json > oh-epsg32122.ndjson
+
+ndjson-map "d.id = d.properties.GEOID.slice(2), d" < oh-epsg32122.ndjson > oh-epsg32122-id.ndjson
+
+curl "https://api.census.gov/data/2015/acs5?get=B01003_001E&for=tract:*&in=state:39" -o cb_2015_39_tract_B01003.json
+
+https://api.census.gov/data/2015/acs5/profile?get=DP04_0001E,Name&for=tract:*&in=state:39
+https://api.census.gov/data/2015/acs5/profile?get=DP03_0051E,Name&for=tract:*&in=state:39
+
+https://api.census.gov/data/2015/acs5/profile?get=DP04_0001E,NAME&for=tract:*&in=state:01&key=YOUR_KEY_GOES_HERE
+
+
+
+household income
+https://api.census.gov/data/2015/acs5/profile?get=DP03_0051E&for=tract:*&in=state:39
+
+ndjson-cat cb_2015_39_tract_B01003.json | ndjson-split "d.slice(1)" | ndjson-map "{id: d[2] + d[3], B01003: +d[0]}" > cb_2015_39_tract_B01003.ndjson
+
+ndjson-join "d.id" oh-epsg32122-id.ndjson cb_2015_39_tract_B01003.ndjson > oh-epsg32122-join.ndjson
+
+ndjson-map "d[0].properties = {density: Math.floor(d[1].B01003 / d[0].properties.ALAND * 2589975.2356)}, d[0]" < oh-epsg32122-join.ndjson > oh-epsg32122-density.ndjson
+
+ndjson-reduce < oh-epsg32122-density.ndjson | ndjson-map "{type: 'FeatureCollection', features: d}" > oh-epsg32122-density.json
+
+ndjson-map -r d3 "(d.properties.fill = d3.scaleSequential(d3.interpolateViridis).domain([0, 4000])(d.properties.density), d)" < oh-epsg32122-density.ndjson > oh-epsg32122-color.ndjson
+
+geo2svg -n --stroke none -p 1 -w 960 -h 960 < oh-epsg32122-color.ndjson > oh-epsg32122-color.svg
+
+
+geo2topo -n tracts=oh-epsg32122-density.ndjson > oh-tracts-topo.json
+
+toposimplify -p 1 -f < oh-tracts-topo.json > oh-simple-topo.json
+
+topoquantize 1e5 < oh-simple-topo.json > oh-quantized-topo.json
+
+topomerge -k "d.id.slice(0, 3)" counties=tracts < oh-quantized-topo.json > oh-merge-topo.json
+
+topomerge --mesh -f "a !== b" counties=counties < oh-merge-topo.json > oh-topo.json
+
+topo2geo tracts=- < oh-topo.json | ndjson-map -r d3 "z = d3.scaleSequential(d3.interpolateViridis).domain([0, 4000]), d.features.forEach(f => f.properties.fill = z(f.properties.density)), d"| ndjson-split "d.features"| geo2svg -n --stroke none -p 1 -w 960 -h 960 > oh-tracts-color.svg
+
+topo2geo tracts=- ^
+  < oh-topo.json ^
+  | ndjson-map -r d3 "z = d3.scaleSequential(d3.interpolateViridis).domain([0, 100]), d.features.forEach(f => f.properties.fill = z(Math.sqrt(f.properties.density))), d" ^
+  | ndjson-split "d.features" ^
+  | geo2svg -n --stroke none -p 1 -w 960 -h 960 ^
+  > oh-tracts-sqrt.svg
+  
+  
+  topo2geo tracts=- ^
+  < oh-topo.json ^
+  | ndjson-map -r d3 "z = d3.scaleLog().domain(d3.extent(d.features.filter(f => f.properties.density), f => f.properties.density)).interpolate(() => d3.interpolateViridis), d.features.forEach(f => f.properties.fill = z(f.properties.density)), d" ^
+  | ndjson-split "d.features" ^
+  | geo2svg -n --stroke none -p 1 -w 960 -h 960 ^
+  > oh-tracts-log.svg
+  
+  topo2geo tracts=- ^
+  < oh-topo.json ^
+  | ndjson-map -r d3 "z = d3.scaleQuantile().domain(d.features.map(f => f.properties.density)).range(d3.quantize(d3.interpolateViridis, 256)), d.features.forEach(f => f.properties.fill = z(f.properties.density)), d" ^
+  | ndjson-split "d.features" ^
+  | geo2svg -n --stroke none -p 1 -w 960 -h 960 ^
+  > oh-tracts-quantile.svg
+  
+  topo2geo tracts=- ^
+  < oh-topo.json ^
+  | ndjson-map -r d3 -r d3=d3-scale-chromatic "z = d3.scaleThreshold().domain([1, 10, 50, 200, 500, 1000, 2000, 4000]).range(d3.schemeOrRd[9]), d.features.forEach(f => f.properties.fill = z(f.properties.density)), d" ^
+  | ndjson-split "d.features" ^
+  | geo2svg -n --stroke none -p 1 -w 960 -h 960 ^
+  > oh-tracts-threshold.svg
+  
+(topo2geo tracts=- ^
+    < oh-topo.json ^
+    | ndjson-map -r d3 -r d3=d3-scale-chromatic "z = d3.scaleThreshold().domain([1, 10, 50, 200, 500, 1000, 2000, 4000]).range(d3.schemeOrRd[9]), d.features.forEach(f => f.properties.fill = z(f.properties.density)), d" ^
+    | ndjson-split "d.features" & ^
+topo2geo counties=- ^
+    < oh-topo.json ^
+    | ndjson-map "d.properties = {'stroke': '#000', 'stroke-opacity': 0.3}, d")^
+  | geo2svg -n --stroke none -p 1 -w 960 -h 960 > oh.svg
+  
+  
+  tail -n +4 ^
+  < legend.svg ^
+  >> topo.svg

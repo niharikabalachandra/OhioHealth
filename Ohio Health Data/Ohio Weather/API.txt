@@ -1,0 +1,5 @@
+Open weather API KEY: 
+9808722264e25234e5b790a0b5fb3430
+
+From <https://home.openweathermap.org/api_keys> 
+
