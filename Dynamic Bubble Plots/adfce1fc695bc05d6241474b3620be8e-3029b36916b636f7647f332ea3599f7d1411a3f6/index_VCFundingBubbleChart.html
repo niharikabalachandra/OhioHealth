@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <style>
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+    }
+    text {
+      text-anchor: middle;
+      fill: #fff;
+    }
+    </style>
+  </head>
+  <body>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://unpkg.com/shape2path@2.0.0/build/shape2path.min.js"></script>
+    <script src="https://unpkg.com/jeezy@1.12.0/lib/jeezy.min.js"></script>
+    <script>
+    var alphabet = "Health care|Analytics|Biotechnology|Big data|Robotics|Hospitality|Travel|Internet|Privacy|Social media|Data Center|Data Storage|Software|Video|Biotechnology|Health Care|IT|3D printing|Robotics|Drones|Robotics|AI|Machine Learning".split("|");
+
+    var width = window.innerWidth, height = window.innerHeight;
+
+    var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+
+    var pack = d3.pack()
+        .size([width, height])
+        .padding(1.5);
+
+    redraw(randomizeData());
+    d3.interval(function(){
+      redraw(randomizeData());
+    }, 5000);
+
+    function redraw(classes){
+
+      // hierarchy
+      var h = d3.hierarchy({children: classes})
+          .sum(function(d) { return d.size; })
+
+      //JOIN
+      var circle = svg.selectAll("path")
+          .data(pack(h).leaves(), function(d){ return d.data.name; });
+
+      var text = svg.selectAll("text")
+          .data(pack(h).leaves(), function(d){ return d.data.name; });
+
+      //EXIT
+      circle.exit()
+          .style("fill", "#b26745")
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: 1e-6}); })
+          .remove();
+
+      text.exit()
+        .transition()
+          .attr("opacity", 1e-6)
+          .remove();
+
+      //UPDATE
+      circle
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
+          .style("fill", "#3a403d");
+
+      text
+        .transition()
+          .attr("x", function(d){ return d.x; })
+          .attr("y", function(d){ return d.y; });
+
+      //ENTER
+      circle.enter().append("path")
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: 1e-6}); })
+          .style("fill", "#fff")
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
+          .style("fill", "#45b29d");
+
+      text.enter().append("text")
+          .attr("opacity", 1e-6)
+          .attr("x", function(d){ return d.x; })
+          .attr("y", function(d){ return d.y; })
+          .attr("dy", 6)
+          .text(function(d){ return d.data.name; })
+        .transition()
+          .attr("opacity", 1);
+    }
+
+    function randomizeData(){
+      var out = [];
+      var shuffled = jz.arr.shuffle(alphabet);
+      for (var i = 0; i < jz.num.randBetween(1, alphabet.length); i++){
+        out.push({name: shuffled[i], size: jz.num.randBetween(1, 10)});
+      }
+      return out;
+    }
+
+    </script>
+  </body>
+</html>

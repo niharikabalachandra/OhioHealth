@@ -1,0 +1,5 @@
+Like [Bubble Update Pattern I](http://bl.ocks.org/HarryStevens/54d01f118bc8d1f2c4ccd98235f33848) but with the circles drawn as SVG [`path`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path) elements instead of [`circle`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle) elements. Uses a custom function called `circleToPath` to draw paths that look like circles.
+
+This uses a couple of my libraries: [jeezy](https://www.npmjs.com/package/jeezy) and [shape2path](https://www.npmjs.com/package/shape2path).
+
+See also: [Force Update Pattern](https://bl.ocks.org/HarryStevens/bc938c8d45008d99faed47039fbe5d49), [Voronoi Update Pattern II](https://bl.ocks.org/HarryStevens/044aa7410a497b09a327180acba51764) and [Voronoi Update Pattern](http://bl.ocks.org/HarryStevens/b638f5bfb5bd79bdc49b61570f4c69db).
