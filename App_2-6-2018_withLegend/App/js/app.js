@@ -164,7 +164,14 @@ particlesJS('particles-js',
     .attr('y', 532)
     .attr('transform', 'rotate(-8 0 0)')
     .on("click", clicked);
-
+	
+var logo = svg.append('svg:image')
+    .attr("xlink:href","images/ohiohealth.svg")
+    .attr('id', 'logo')
+    .attr('width', 750)
+    .attr('height', 930)
+    .attr('x', -90)
+	.attr('y', -325);
 
 
 function clicked(d) {
@@ -336,7 +343,7 @@ function zoomOut(d) {
     .attr('id', 'VC')
     .attr("viewBox", "0 0 1680 840");
   
-    var alphabet = "Health care|Analytics|Biotechnology|Big data|Robotics|Hospitality|Travel|Internet|Privacy|Social media|Data Center|Data Storage|Software|Biotechnology|Health Care|IT|3D printing|Robotics|Drones|Robotics|AI|Machine Learning".split("|");
+    var alphabet = "Health care|Big data|Robotics|Hospitality|Travel|Internet|Privacy|Social media|Data Center|Data Storage|Software|IT|3D printing|Robotics|Drones|Robotics|Machine Learning".split("|");
 
     var width = window.innerWidth/2, height = window.innerHeight/2;
 
@@ -349,7 +356,7 @@ function zoomOut(d) {
     redraw(randomizeData());
     d3.interval(function(){
       redraw(randomizeData());
-    }, 1000);
+    }, 1000*60);
 
     function redraw(classes){
 
@@ -366,7 +373,7 @@ function zoomOut(d) {
 
       //EXIT
       circle.exit()
-          .style("fill", "#b26745")
+          .style("fill", "#e0ecf4")
         .transition()
           .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: 1e-6}); })
           .remove();
@@ -380,7 +387,7 @@ function zoomOut(d) {
       circle
         .transition()
           .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
-          .style("fill", "#3a403d");
+          .style("fill", "#810f7c");
 
       text
         .transition()
@@ -393,7 +400,7 @@ function zoomOut(d) {
           .style("fill", "#fff")
         .transition()
           .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
-          .style("fill", "#45b29d");
+          .style("fill", "#8c96c6");
 
       text.enter().append("text")
           .attr("opacity", 1e-6)

@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+  <head>
+	<meta charset="utf-8">
+    <title>Ohio Health</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+	<div id="particles-js"></div>
+	<div id="container"></div>
+	<div id="container2">
+	
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://unpkg.com/jeezy@1.12.0/lib/jeezy.min.js"></script>
+  <script src="https://unpkg.com/d3-marcon@2.0.2/build/d3-marcon.min.js"></script>
+  <script>
+    var alpha = "#DigitalHealth|#FOAMed|#mhealth|#hcsm|#MedEd|#HealthTalk|#doctors20|#4patients|#HCR|#Hitsm".split("|");
+	/* #DigitalHealth
+#FOAMed (Free open access meducaton)
+#mhealth (mobile health)
+#hcsm (healthcare social media)
+#MedEd (Medical Education)
+#HealthTalk
+#doctors20 (How Doctors are Using Social Media and Web 2.0 Tools)
+#4patients
+#HCR (Health Care Reform)
+#Hitsm (Health Care IT Social Media)*/
+    var setup = d3.marcon()
+        .top(20)
+        .bottom(20)
+        .left(10)
+        .right(10)
+        .width(window.innerWidth/2)
+        .height(window.innerHeight/2);
+
+    setup.render();
+
+    var width = setup.innerWidth(), height = setup.innerHeight(), svg = setup.svg();
+
+    var x = d3.scaleBand()
+      .rangeRound([0, width])
+      .domain(alpha)
+      .padding(.2);
+
+    var y = d3.scaleLinear()
+      .range([height, 0])
+      .domain([0, 100000]);
+
+    var x_axis = d3.axisBottom(x);
+
+    var y_axis = d3.axisRight(y)
+      .tickSize(width)
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(x_axis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(customYAxis);
+
+    var color = d3.scaleOrdinal(["#8da0cb","#8da0cb","#8da0cb","#8da0cb","#8da0cb","#8da0cb","#8da0cb"]);
+
+    redraw(random_data());
+
+    d3.interval(function(){
+      redraw(random_data());
+    }, 10000);
+
+    function redraw(data){
+      var x_var = Object.keys(data[0])[0], y_var = Object.keys(data[0])[1];
+      
+      y_axis.tickFormat(function(d, i, ticks){ return i == ticks.length - 1 ? d + " " + y_var + "s" : d; });
+      d3.select(".y.axis").call(customYAxis);
+
+      // join
+      var bar = svg.selectAll(".bar")
+        .data(data, function(d){ return d[x_var]; });
+
+      var amount = svg.selectAll(".amount")
+        .data(data, function(d){ return d[x_var]; });
+
+      // update
+      bar
+        .transition()
+          .attr("y", function(d){ return y(d[y_var]); })
+          .attr("height", function(d){ return height - y(d[y_var]); });
+
+      amount
+        .transition()
+          .attr("y", function(d){ return y(d[y_var]); })
+          .text(function(d){ return d[y_var]; });
+
+      // enter
+      bar.enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d){ return x(d[x_var]); })
+          .attr("y", function(d){ return y(d[y_var]); })
+          .attr("width", x.bandwidth())
+          .attr("height", function(d){ return height - y(d[y_var]); })
+          .attr("fill", function(d){ return color(d[x_var]); });
+
+      amount.enter().append("text")
+          .attr("class", "amount")
+          .attr("x", function(d){ return x(d[x_var]) + (x.bandwidth() / 2-17); })
+          .attr("y", function(d){ return y(d[y_var]); })
+          .attr("dy", 16)
+          .text(function(d){ return d[y_var]; });
+
+    }
+
+    function random_data(){
+      return alpha.map(function(d){
+        return {
+          name: d,
+          value: jz.num.randBetween(1, 100000)
+        }
+      });
+    }
+
+    function customYAxis(g) {
+      g.call(y_axis);
+      g.select(".domain").remove();
+      g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "#777").attr("stroke-dasharray", "2,2");
+      g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+    }
+
+  </script>
+	</div>
+<div id="container3">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://unpkg.com/shape2path@2.0.0/build/shape2path.min.js"></script>
+    <script src="https://unpkg.com/jeezy@1.12.0/lib/jeezy.min.js"></script>
+    <script>
+    var alphabet = "Health care|Analytics|Biotechnology|Big data|Robotics|Hospitality|Travel|Internet|Privacy|Social media|Data Center|Data Storage|Software|Video|Biotechnology|Health Care|IT|3D printing|Robotics|Drones|Robotics|AI|Machine Learning".split("|");
+
+    var width = window.innerWidth, height = window.innerHeight;
+
+    var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+
+    var pack = d3.pack()
+        .size([width, height])
+        .padding(1.5);
+
+    redraw(randomizeData());
+    d3.interval(function(){
+      redraw(randomizeData());
+    }, 5000);
+
+    function redraw(classes){
+
+      // hierarchy
+      var h = d3.hierarchy({children: classes})
+          .sum(function(d) { return d.size; })
+
+      //JOIN
+      var circle = svg.selectAll("path")
+          .data(pack(h).leaves(), function(d){ return d.data.name; });
+
+      var text = svg.selectAll("text")
+          .data(pack(h).leaves(), function(d){ return d.data.name; });
+
+      //EXIT
+      circle.exit()
+          .style("fill", "#b26745")
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: 1e-6}); })
+          .remove();
+
+      text.exit()
+        .transition()
+          .attr("opacity", 1e-6)
+          .remove();
+
+      //UPDATE
+      circle
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
+          .style("fill", "#3a403d");
+
+      text
+        .transition()
+          .attr("x", function(d){ return d.x; })
+          .attr("y", function(d){ return d.y; });
+
+      //ENTER
+      circle.enter().append("path")
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: 1e-6}); })
+          .style("fill", "#fff")
+        .transition()
+          .attr("d", function(d){ return shape2path.circle({cx: d.x, cy: d.y, r: d.r}); })
+          .style("fill", "#45b29d");
+
+      text.enter().append("text")
+          .attr("opacity", 1e-6)
+          .attr("x", function(d){ return d.x; })
+          .attr("y", function(d){ return d.y; })
+          .attr("dy", 6)
+          .text(function(d){ return d.data.name; })
+        .transition()
+          .attr("opacity", 1);
+    }
+
+    function randomizeData(){
+      var out = [];
+      var shuffled = jz.arr.shuffle(alphabet);
+      for (var i = 0; i < jz.num.randBetween(1, alphabet.length); i++){
+        out.push({name: shuffled[i], size: jz.num.randBetween(1, 10)});
+      }
+      return out;
+    }
+
+    </script>
+</div>
+	<script src="js/particles.js" type="text/javascript"></script>
+	<script src="js/app.js" type="text/javascript"></script>
+  </body>
+</html>
