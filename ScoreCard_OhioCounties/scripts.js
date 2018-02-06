@@ -6,7 +6,7 @@ var dataArray = [];
 var headers = ['Name', 'Value', {role: 'style'}, {role: 'annotation'}]
 dataArray.push(headers);
 json.forEach(function(d,i){
-  d.category === 'A' ? fill = '#CCC' : fill =  '#B44682';
+  d.category === 'A' ? fill = '#CCC' : fill =  '#8c6bb1';
   i === 0 || i === json.length - 1 ? annotation = d.value : annotation = null;
   dataArray.push([d.name, d.value, fill, annotation]);
 });
