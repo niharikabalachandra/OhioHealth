@@ -5,7 +5,7 @@
 
 
 ## Trending Twitter Hashtags
-![alt text](twitter_trending hashtags.PNG)
+![alt text](twitter_trendingHashtags.PNG)
 
 ## Health Ranking showing top 10 Ohio Counties
 ![alt text](HealthRankingOhio.PNG)
