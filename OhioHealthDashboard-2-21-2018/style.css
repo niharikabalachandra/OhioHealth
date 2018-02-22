@@ -1,0 +1,104 @@
+html, body {
+  margin: 0;
+  height: 105%;
+  font-family: sans-serif;
+  background:#333 ; /*#e0ecf4*/
+}
+
+.label{
+	font-size: 11px;
+  font-family: sans-serif;
+  color:#b8b7b7;
+
+}
+
+.legend text,
+.axis text {
+	font-size: 11px;
+	fill: #b8b7b7;
+  font-family: sans-serif;
+}
+
+.axis path,
+.axis line{
+	fill: none;
+	stroke-width: 1px;
+	stroke: #b8b7b7;
+}
+
+.circle{
+	fill-opacity: 0.65;
+}
+
+.bubble{
+	opacity: 1;
+	transition: opacity 0.3s;
+}
+
+.bubble:hover text{
+	opacity: 1;
+}
+
+.bubble:hover circle{
+	fill-opacity: 1;
+}
+
+.legend rect{
+	fill-opacity: 0.85;
+}
+
+.legend:hover rect{
+	fill-opacity:1;
+}
+
+
+
+.stack-rect{
+	opacity: 1;
+	transition: opacity 0.3s;
+}
+
+.stack-rect:hover text{
+	opacity: 1;
+}
+
+.stack-rect:hover rect{
+	fill-opacity: 1;
+}
+
+.legend2 rect{
+	fill-opacity: 0.85;
+}
+
+.legend2:hover rect{
+	fill-opacity:1;
+}
+
+.chartGroup3 { background: #333; }
+.chartGroup3 path { stroke: #333; stroke-width: 1; }
+.chartGroup3 path:hover { stroke-width: 3; }
+
+.label{
+  fill: #b8b7b7;
+  font-size: 15px;
+}
+
+
+form{
+  position:absolute;
+  left: 10px;
+  top:45px;
+  font-family: sans-serif;
+  color:#b8b7b7;
+  font-size: 15px;
+
+}
+
+label ,span{
+  font-family: : sans-serif;
+  color:#b8b7b7;
+  font-size: 15px;
+}
+/*.axis .domain {
+  display: none;
+}*/

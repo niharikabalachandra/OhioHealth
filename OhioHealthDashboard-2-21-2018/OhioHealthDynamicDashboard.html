@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Ohio Health Dynamic Dashboard</title>
+		<link rel="stylesheet" type="text/css" href="style.css" >
+		<script type="text/javascript" src="d3.v4.js"></script>
+		<script type="text/javascript" src="topojson.v1.min.js"></script>
+		<script type="text/javascript" src="d3-queue.v3.min.js"></script>
+	</head>
+
+	<body>
+		<script type="text/javascript" src="dashboard.js"></script>
+		<form class='slider'>
+
+			<label class= "label" for="year">Year: </label>
+			<input type="range" min=2012 max=2017 step=1 id="year" value=2017 oninput="selected_year.value = year.value">
+			<output name="selected_year" id="selected_year">2017</output>
+    </form>
+  </body>
+
+</html>
